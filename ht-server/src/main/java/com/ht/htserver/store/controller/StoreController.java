@@ -2,6 +2,7 @@ package com.ht.htserver.store.controller;
 
 import com.ht.htserver.auth.service.JwtService;
 import com.ht.htserver.store.dto.request.CreateStoreRequest;
+import com.ht.htserver.store.dto.request.UpdateStoreRequest;
 import com.ht.htserver.store.dto.response.CreateStoreResponse;
 import com.ht.htserver.store.dto.response.StoreResponse;
 import com.ht.htserver.store.entity.Store;
@@ -50,10 +51,38 @@ public class StoreController {
     }
 
     @GetMapping("/{store_id}")
+    @Operation(summary = "가게 정보 조회", description = "가게 ID로 가게 정보를 조회합니다")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "가게 조회 성공",
+                content = @Content(schema = @Schema(implementation = StoreResponse.class))),
+        @ApiResponse(responseCode = "404", description = "가게를 찾을 수 없음", content = @Content)
+    })
     public ResponseEntity<StoreResponse> getStore(
             @PathVariable(name = "store_id") UUID storeId
     ) {
         Store store = storeService.getStore(storeId);
+        return ResponseEntity.ok(StoreResponse.toDto(store));
+    }
+
+    @PutMapping("/{store_id}")
+    @Operation(summary = "가게 정보 수정", description = "기존 가게의 정보를 수정합니다")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "가게 수정 성공",
+                content = @Content(schema = @Schema(implementation = StoreResponse.class))),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 본문", content = @Content),
+        @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자", content = @Content),
+        @ApiResponse(responseCode = "403", description = "가게 수정 권한 없음", content = @Content),
+        @ApiResponse(responseCode = "404", description = "가게를 찾을 수 없음", content = @Content)
+    })
+    public ResponseEntity<StoreResponse> updateStore(
+            HttpServletRequest httpServletRequest,
+            @PathVariable(name = "store_id") UUID storeId,
+            @Valid @RequestBody UpdateStoreRequest updateStoreRequest
+    ) {
+        UUID userId = jwtService.getUserIdFromRequest(httpServletRequest);
+        
+        Store store = storeService.updateStore(storeId, updateStoreRequest, userId);
+        
         return ResponseEntity.ok(StoreResponse.toDto(store));
     }
 }
