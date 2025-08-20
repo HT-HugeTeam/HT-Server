@@ -1,11 +1,14 @@
 package com.ht.htserver.user.entity;
 
 import com.ht.htserver.common.entity.BaseEntity;
+import com.ht.htserver.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -43,4 +46,12 @@ public class User extends BaseEntity {
 
     @Column(name = "location_service_accepted", nullable = false)
     private Boolean locationServiceAccepted = false;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Store> stores = new ArrayList<>();
+
+    public void addStore(Store s) {
+        stores.add(s);
+        s.setUser(this);
+    }
 }
