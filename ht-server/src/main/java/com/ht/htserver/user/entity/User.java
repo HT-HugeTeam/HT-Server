@@ -31,6 +31,10 @@ public class User extends BaseEntity {
     @Column(name = "nickname")
     private String nickname;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role = Role.USER;
+
     @Column(name = "terms_of_service_accepted", nullable = false)
     private Boolean termsOfServiceAccepted = false;
 

@@ -8,9 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-@Schema(description = "Login response containing JWT access token")
+@Schema(description = "JWT 액세스 토큰을 포함하는 로그인 응답")
 public class LoginResponse {
     
-    @Schema(description = "JWT access token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+    @Schema(description = "JWT 액세스 토큰", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     private String accessToken;
 }

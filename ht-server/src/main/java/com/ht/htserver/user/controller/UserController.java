@@ -24,7 +24,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@Tag(name = "User", description = "User management APIs")
+@Tag(name = "User", description = "사용자 관리 API")
 @SecurityRequirement(name = "Bearer Authentication")
 public class UserController {
 
@@ -32,12 +32,12 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/onboarding")
-    @Operation(summary = "Get user onboarding status", description = "Retrieve current user's onboarding information and agreement status")
+    @Operation(summary = "사용자 온보딩 상태 조회", description = "현재 사용자의 온보딩 정보 및 동의 상태를 조회합니다")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved onboarding status",
+        @ApiResponse(responseCode = "200", description = "온보딩 상태 조회 성공",
                 content = @Content(schema = @Schema(implementation = UserOnboardingStatusResponse.class))),
-        @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing JWT token", content = @Content),
-        @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+        @ApiResponse(responseCode = "401", description = "인증 실패 - 유효하지 않거나 누락된 JWT 토큰", content = @Content),
+        @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음", content = @Content)
     })
     public ResponseEntity<UserOnboardingStatusResponse> getOnboardingStatus(HttpServletRequest httpServletRequest) {
 
@@ -54,14 +54,14 @@ public class UserController {
         );
     }
 
-    @PostMapping("/onboarding")
-    @Operation(summary = "Update user onboarding status", description = "Update user's nickname and agreement status for terms of service, privacy policy, and location services")
+    @PutMapping("/onboarding")
+    @Operation(summary = "사용자 온보딩 상태 업데이트", description = "사용자의 닉네임 및 서비스 이용약관, 개인정보보호정책, 위치기반서비스 동의 상태를 업데이트합니다")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully updated onboarding status",
+        @ApiResponse(responseCode = "200", description = "온보딩 상태 업데이트 성공",
                 content = @Content(schema = @Schema(implementation = UserOnboardingStatusResponse.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid request body", content = @Content),
-        @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing JWT token", content = @Content),
-        @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+        @ApiResponse(responseCode = "400", description = "잘못된 요청 본문", content = @Content),
+        @ApiResponse(responseCode = "401", description = "인증 실패 - 유효하지 않거나 누락된 JWT 토큰", content = @Content),
+        @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음", content = @Content)
     })
     public ResponseEntity<UserOnboardingStatusResponse> updateUserOnboardingStatus(
             HttpServletRequest httpServletRequest,

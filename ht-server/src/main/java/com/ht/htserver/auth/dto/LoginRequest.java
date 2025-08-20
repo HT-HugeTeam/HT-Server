@@ -7,10 +7,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Schema(description = "Login request with Kakao ID")
+@Schema(description = "카카오 ID로 로그인 요청")
 public class LoginRequest {
     
-    @NotBlank(message = "Kakao ID is required")
-    @Schema(description = "Kakao user ID", example = "12345678")
+    @NotBlank(message = "카카오 ID는 필수입니다")
+    @Schema(description = "카카오 사용자 ID", example = "12345678")
     private String kakaoId;
 }
