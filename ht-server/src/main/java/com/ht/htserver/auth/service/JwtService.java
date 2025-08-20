@@ -1,5 +1,7 @@
 package com.ht.htserver.auth.service;
 
+import com.ht.htserver.auth.exception.InvalidTokenException;
+import com.ht.htserver.auth.exception.TokenNotFoundException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,7 +47,7 @@ public class JwtService {
             
             return UUID.fromString(claims.getSubject());
         } catch (JwtException | IllegalArgumentException e) {
-            throw new RuntimeException("Invalid JWT token", e);
+            throw new InvalidTokenException(e.getMessage());
         }
     }
     
@@ -63,7 +65,7 @@ public class JwtService {
         String token = getTokenFromRequest(request);
         
         if (token == null) {
-            throw new RuntimeException("No authorization token found");
+            throw new TokenNotFoundException("No authorization token found");
         }
         
         return getUserIdFromToken(token);

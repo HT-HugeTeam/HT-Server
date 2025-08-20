@@ -24,10 +24,19 @@ public class User extends BaseEntity {
     
     @Column(name = "email")
     private String email;
-    
-    @Column(name = "nickname")
-    private String nickname;
-    
+
     @Column(name = "profile_image_url")
     private String profileImageUrl;
+
+    @Column(name = "nickname")
+    private String nickname;
+
+    @Column(name = "terms_of_service_accepted", nullable = false)
+    private Boolean termsOfServiceAccepted = false;
+
+    @Column(name = "privacy_policy_accepted", nullable = false)
+    private Boolean privacyPolicyAccepted = false;
+
+    @Column(name = "location_service_accepted", nullable = false)
+    private Boolean locationServiceAccepted = false;
 }
