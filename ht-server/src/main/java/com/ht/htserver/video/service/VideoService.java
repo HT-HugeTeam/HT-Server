@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,6 +25,10 @@ public class VideoService {
     private final StoreService storeService;
     private final VideoRepository videoRepository;
 
+    @Transactional(readOnly = true)
+    public List<Video> getVideosByUserId(UUID userId) {
+        return videoRepository.findByUserId(userId);
+    }
 
     @Transactional(readOnly = true)
     public Video getVideo(UUID videoId) {
