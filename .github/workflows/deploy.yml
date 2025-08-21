@@ -1,0 +1,23 @@
+name: Deploy to my Raspberry Pi
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to my Raspberry Pi
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script_stop: true
+          script: |
+            cd /home/ericpark/apps/HT-Server
+            git pull origin main
+            docker compose -f docker-compose.prod.yaml down
+            docker compose -f docker-compose.prod.yaml up -d --build
