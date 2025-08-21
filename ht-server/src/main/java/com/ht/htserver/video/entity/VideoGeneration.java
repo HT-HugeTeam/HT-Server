@@ -5,28 +5,38 @@ import com.ht.htserver.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "video_generations")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
 public class  VideoGeneration extends BaseEntity {
     @Column
     private String text;
 
-    @Column
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    @Builder.Default
+    private VideoGenerationStatus status = VideoGenerationStatus.IDLE;
+
     @OneToMany(mappedBy = "videoGeneration", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ImageRequest> images = new ArrayList<>();
 
-    @Column
     @OneToMany(mappedBy = "videoGeneration", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<VideoRequest> videos = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "video_id", unique = true, nullable = true)
+    private Video video;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "store_id")
