@@ -16,6 +16,12 @@ jwt:
   secret: ${JWT_SECRET:mySecretKeyThatIsAtLeast256BitsLongForHS256Algorithm}
   expiration: ${JWT_EXPIRATION:86400000}
 
+kakao:
+  client-id: ${KAKAO_CLIENT_ID:your_kakao_client_id}
+  client-secret: ${KAKAO_CLIENT_SECRET:your_kakao_client_secret}
+  token-url: https://kauth.kakao.com/oauth/token
+  user-info-url: https://kapi.kakao.com/v2/user/me
+
 springdoc:
   api-docs:
     path: /api-docs
