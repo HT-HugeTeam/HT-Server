@@ -17,11 +17,6 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class User extends BaseEntity {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    
     @Column(name = "kakao_id", unique = true, nullable = false)
     private String kakaoId;
     
