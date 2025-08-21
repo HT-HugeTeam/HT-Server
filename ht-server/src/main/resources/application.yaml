@@ -31,4 +31,5 @@ springdoc:
     use-root-path: true
 
 server:
+  forward-headers-strategy: native
   port: 30001
