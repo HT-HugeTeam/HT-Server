@@ -69,11 +69,17 @@ public class VideoService {
             videoGeneration.addImage(imageRequest);
         });
 
+        // Call the ai server with the provided images, videos, text, store info
+
         return videoGenerationRepository.save(videoGeneration);
     }
 
     @Transactional(readOnly = true)
     public VideoGeneration getVideoGenerationStatus(UUID videoGenerationId) {
+
+        // call the creatomate api with the video generation id, check what status it's in currently.
+        // update the database with the returned info
+
         return videoGenerationRepository.findById(videoGenerationId)
                 .orElseThrow(VideoGenerationNotFoundException::new);
     }

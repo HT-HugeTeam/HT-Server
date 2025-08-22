@@ -8,12 +8,14 @@ import {
 import {
   ImageAnalysis,
   VideoScript,
+  VideoScriptTemplate3,
   VoiceoverResult,
-  AudioWithDuration,
   DynamicTiming,
+  DynamicTimingTemplate3,
+  TextSegment,
+  CreatomateModifications,
 } from './types';
 import { parseBuffer } from 'music-metadata';
-import Creatomate from 'creatomate';
 import {
   GetObjectCommand,
   PutObjectCommand,
@@ -44,118 +46,124 @@ export class AppService {
     imageUrls: string[],
     text: string,
   ): Promise<ImageAnalysis> {
-    // const response = await this.openAiClient.responses.create({
-    //   model: 'gpt-5-nano-2025-08-07',
-    //   reasoning: { effort: 'minimal' },
-    //   input: [
-    //     {
-    //       role: 'system',
-    //       content: SYSTEM_IMAGE_ANALYSIS,
-    //     },
-    //     {
-    //       role: 'user',
-    //       content: [
-    //         ...imageUrls.map((imageUrl) => ({
-    //           type: 'input_image' as const,
-    //           image_url: imageUrl,
-    //           detail: 'auto' as const,
-    //         })),
-    //         {
-    //           type: 'input_text' as const,
-    //           text: userImageAnalysisPrompt(text, imageUrls),
-    //         },
-    //       ] as const,
-    //     },
-    //   ],
-    //   max_output_tokens: 400,
-    // });
-
-    // console.log(JSON.parse(response.output_text));
-
-    // return JSON.parse(response.output_text) as ImageAnalysis;
-
-    return {
-      imageDescriptions: [
+    const response = await this.openAiClient.responses.create({
+      model: 'gpt-5-nano-2025-08-07',
+      reasoning: { effort: 'minimal' },
+      input: [
         {
-          description:
-            '송풍 구운 스테이크와 다진 파가 올려진 반달 접시, 고소한 소스와 훈연 느낌의 데판 스타일 분위기.',
-          caption: '파가 올린 반접시 데판의 매력',
+          role: 'system',
+          content: SYSTEM_IMAGE_ANALYSIS,
         },
         {
-          description:
-            '둥근 나무 토기에 담긴 덮밥 위에 연어와 장어가 층층이 얹혀 있고 밥이 보이는 비주얼.',
-          caption: '천상의 밥상, 복돌이의 가게',
+          role: 'user',
+          content: [
+            ...imageUrls.map((imageUrl) => ({
+              type: 'input_image' as const,
+              image_url: imageUrl,
+              detail: 'auto' as const,
+            })),
+            {
+              type: 'input_text' as const,
+              text: userImageAnalysisPrompt(text, imageUrls),
+            },
+          ] as const,
         },
       ],
-    };
+      max_output_tokens: 400,
+    });
+
+    console.log(JSON.parse(response.output_text));
+
+    return JSON.parse(response.output_text) as ImageAnalysis;
   }
 
   async createVideoScript(
     imageAnalysis: ImageAnalysis,
     text: string,
   ): Promise<VideoScript> {
-    // const response = await this.openAiClient.responses.create({
-    //   model: 'gpt-5-nano-2025-08-07',
-    //   reasoning: { effort: 'minimal' },
-    //   input: [
-    //     {
-    //       role: 'system',
-    //       content: SYSTEM_VIDEO_SCRIPT,
-    //     },
-    //     {
-    //       role: 'user',
-    //       content: [
-    //         ...imageAnalysis.imageDescriptions.map((description) => {
-    //           return {
-    //             type: 'input_text' as const,
-    //             text: `description:${description.description},caption:${description.caption}`,
-    //           };
-    //         }),
-    //         {
-    //           type: 'input_text' as const,
-    //           text,
-    //         },
-    //       ] as const,
-    //     },
-    //   ],
-    //   max_output_tokens: 1000,
-    // });
-
-    // console.log(JSON.parse(response.output_text));
-
-    // return JSON.parse(response.output_text) as VideoScript;
-
-    return {
-      hook: {
-        caption: '파가 올린 반접시 매력',
-        voiceover: '파가 올린 반접시의 매력에 푹 빠지게 될 거예요',
-      },
-      body: [
+    const response = await this.openAiClient.responses.create({
+      model: 'gpt-5-nano-2025-08-07',
+      reasoning: { effort: 'minimal' },
+      input: [
         {
-          caption: '데판의 고소한 풍미, 소스까지 한입에',
-          voiceover:
-            '데판의 고소한 풍미가 입안에서 퍼지면서 소스의 깊이가 느껴져요',
+          role: 'system',
+          content: SYSTEM_VIDEO_SCRIPT,
         },
         {
-          caption: '천상의 밥상, 한입의 마법',
-          voiceover: '둥근 그릇에 담긴 층층이 비주얼과 향이 입끝에서 춤춰요',
+          role: 'user',
+          content: [
+            ...imageAnalysis.imageDescriptions.map((description) => {
+              return {
+                type: 'input_text' as const,
+                text: `description:${description.description},caption:${description.caption}`,
+              };
+            }),
+            {
+              type: 'input_text' as const,
+              text,
+            },
+          ] as const,
         },
       ],
-      cta: {
-        caption: '여긴 저장각',
-        voiceover:
-          '지금 바로 저장하고 친구와 공유해 보세요, 신촌의 복돌이의 가게를 방문해요',
-      },
-    };
+      max_output_tokens: 1000,
+    });
+
+    console.log(JSON.parse(response.output_text));
+
+    return JSON.parse(response.output_text) as VideoScript;
+  }
+
+  async createVideoScriptTemplate3(
+    imageAnalysis: ImageAnalysis,
+    text: string,
+  ): Promise<VideoScriptTemplate3> {
+    const response = await this.openAiClient.responses.create({
+      model: 'gpt-5-nano-2025-08-07',
+      reasoning: { effort: 'minimal' },
+      input: [
+        {
+          role: 'system',
+          content: `${SYSTEM_VIDEO_SCRIPT}
+
+IMPORTANT: Generate exactly 3 body sections for Template 3:
+- body[0]: First menu item description
+- body[1]: Second menu item description
+- body[2]: Restaurant atmosphere/ambiance description
+
+The output must follow this exact structure with 3 body sections.`,
+        },
+        {
+          role: 'user',
+          content: [
+            ...imageAnalysis.imageDescriptions.map((description) => {
+              return {
+                type: 'input_text' as const,
+                text: `description:${description.description},caption:${description.caption}`,
+              };
+            }),
+            {
+              type: 'input_text' as const,
+              text,
+            },
+          ] as const,
+        },
+      ],
+      max_output_tokens: 1200,
+    });
+
+    console.log('Template 3 VideoScript:', JSON.parse(response.output_text));
+
+    return JSON.parse(response.output_text) as VideoScriptTemplate3;
   }
 
   async createVoiceoverWithDuration(
-    videoScript: VideoScript,
+    videoScript: VideoScript | VideoScriptTemplate3,
   ): Promise<VoiceoverResult> {
     const hookVoiceover = await this.openAiClient.audio.speech.create({
       model: 'gpt-4o-mini-tts',
-      voice: 'echo',
       input: videoScript.hook.voiceover,
+      voice: 'coral',
+      instructions: 'Speak in a cheerful and positive tone.',
     });
     const hookBuffer = Buffer.from(await hookVoiceover.arrayBuffer());
     const hookDuration = await this.extractAudioDuration(hookBuffer);
@@ -168,8 +176,9 @@ export class AppService {
       videoScript.body.map((b) =>
         this.openAiClient.audio.speech.create({
           model: 'gpt-4o-mini-tts',
-          voice: 'echo',
           input: b.voiceover,
+          voice: 'coral',
+          instructions: 'Speak in a cheerful and positive tone.',
         }),
       ),
     );
@@ -190,8 +199,9 @@ export class AppService {
 
     const ctaVoiceover = await this.openAiClient.audio.speech.create({
       model: 'gpt-4o-mini-tts',
-      voice: 'echo',
       input: videoScript.cta.voiceover,
+      voice: 'coral',
+      instructions: 'Speak in a cheerful and positive tone.',
     });
     const ctaBuffer = Buffer.from(await ctaVoiceover.arrayBuffer());
     const ctaDuration = await this.extractAudioDuration(ctaBuffer);
@@ -214,6 +224,39 @@ export class AppService {
   private async extractAudioDuration(buffer: Buffer): Promise<number> {
     const metadata = await parseBuffer(buffer);
     return metadata.format.duration || 0;
+  }
+
+  private segmentTextForSection(
+    text: string,
+    elementIds: string[],
+    sectionStartTime: number,
+    sectionDuration: number,
+  ): TextSegment[] {
+    if (!text || !elementIds.length || sectionDuration <= 0) {
+      return elementIds.map((elementId) => ({
+        elementId,
+        text: text || '',
+        time: sectionStartTime,
+        duration: sectionDuration,
+      }));
+    }
+
+    const words = text.split(' ').filter((word) => word.length > 0);
+    const wordsPerSegment = Math.ceil(words.length / elementIds.length);
+    const segmentDuration = sectionDuration / elementIds.length;
+
+    return elementIds.map((elementId, index) => {
+      const start = index * wordsPerSegment;
+      const end = Math.min(start + wordsPerSegment, words.length);
+      const segmentText = words.slice(start, end).join(' ');
+
+      return {
+        elementId,
+        text: segmentText || text,
+        time: sectionStartTime + index * segmentDuration,
+        duration: segmentDuration,
+      };
+    });
   }
 
   private calculateDynamicTiming(
@@ -241,6 +284,50 @@ export class AppService {
       bodyADuration,
       bodyBStartTime,
       bodyBDuration,
+      ctaStartTime,
+      ctaDuration,
+      totalDuration,
+    };
+  }
+
+  private calculateDynamicTimingTemplate3(
+    voiceoverResult: VoiceoverResult,
+  ): DynamicTimingTemplate3 {
+    if (voiceoverResult.body.length < 3) {
+      throw new Error('VideoScript must have 3 body sections for Template 3');
+    }
+
+    const hookStartTime = 0;
+    const hookDuration = voiceoverResult.hook.duration;
+
+    const bodyAStartTime = hookStartTime + hookDuration;
+    const bodyADuration = voiceoverResult.body[0].duration;
+
+    const bodyBStartTime = bodyAStartTime + bodyADuration;
+    const bodyBDuration = voiceoverResult.body[1].duration;
+
+    const bodyCStartTime = bodyBStartTime + bodyBDuration;
+    const bodyCDuration = voiceoverResult.body[2].duration;
+
+    const ctaStartTime = bodyCStartTime + bodyCDuration;
+    const ctaDuration = voiceoverResult.cta.duration;
+
+    const totalDuration =
+      hookDuration +
+      bodyADuration +
+      bodyBDuration +
+      bodyCDuration +
+      ctaDuration;
+
+    return {
+      hookStartTime,
+      hookDuration,
+      bodyAStartTime,
+      bodyADuration,
+      bodyBStartTime,
+      bodyBDuration,
+      bodyCStartTime,
+      bodyCDuration,
       ctaStartTime,
       ctaDuration,
       totalDuration,
@@ -306,6 +393,112 @@ export class AppService {
     };
   }
 
+  private generateTemplate3Modifications(
+    videoScript: VideoScriptTemplate3,
+    voiceoverResult: VoiceoverResult,
+    timing: DynamicTimingTemplate3,
+    mediaSources: {
+      videoSrc: string;
+      image1Src: string;
+      image2Src: string;
+      image3Src: string;
+    },
+  ): CreatomateModifications {
+    const modifications: CreatomateModifications = {};
+
+    // Background videos
+    modifications['Video-637.source'] = mediaSources.videoSrc;
+    modifications['Video-CB6.source'] = mediaSources.videoSrc;
+    modifications['Video-CB6.duration'] = timing.totalDuration + 1;
+
+    // Images with dynamic timing
+    modifications['Image-H2V.source'] = mediaSources.image1Src;
+    modifications['Image-H2V.time'] = timing.bodyAStartTime;
+    modifications['Image-H2V.duration'] = timing.bodyADuration;
+
+    modifications['Image-H7X.source'] = mediaSources.image2Src;
+    modifications['Image-H7X.time'] = timing.bodyBStartTime;
+    modifications['Image-H7X.duration'] = timing.bodyBDuration;
+
+    modifications['Image-2MB.source'] = mediaSources.image2Src;
+    modifications['Image-2MB.time'] = timing.bodyBStartTime;
+    modifications['Image-2MB.duration'] = timing.bodyBDuration;
+
+    modifications['Image-NPN.source'] = mediaSources.image3Src;
+    modifications['Image-NPN.time'] = timing.bodyCStartTime;
+    modifications['Image-NPN.duration'] = timing.bodyCDuration;
+
+    modifications['Image-PD3.source'] = mediaSources.image3Src;
+    modifications['Image-PD3.time'] = timing.bodyCStartTime;
+    modifications['Image-PD3.duration'] = timing.bodyCDuration;
+
+    // Text segmentation for each section
+    const hookSegments = this.segmentTextForSection(
+      videoScript.hook.caption,
+      ['Text-1-DCQ', 'Text-1', 'Text-1-XWZ', 'Text-1-8PL'],
+      timing.hookStartTime,
+      timing.hookDuration,
+    );
+
+    const bodyASegments = this.segmentTextForSection(
+      videoScript.body[0].caption,
+      ['Text-1-X56', 'Text-1-KFW', 'Text-1-HVN'],
+      timing.bodyAStartTime,
+      timing.bodyADuration,
+    );
+
+    // Body B has no text elements in template (visual only)
+
+    const bodyCSegments = this.segmentTextForSection(
+      videoScript.body[2].caption,
+      ['Text-1-7W6', 'Text-1-XKD', 'Text-1-3XD', 'Text-1-6JV'],
+      timing.bodyCStartTime,
+      timing.bodyCDuration,
+    );
+
+    const ctaSegments = this.segmentTextForSection(
+      videoScript.cta.caption,
+      ['Text-1-5SS'],
+      timing.ctaStartTime,
+      timing.ctaDuration,
+    );
+
+    // Apply all text segments
+    [
+      ...hookSegments,
+      ...bodyASegments,
+      ...bodyCSegments,
+      ...ctaSegments,
+    ].forEach((segment) => {
+      modifications[`${segment.elementId}.text`] = segment.text;
+      modifications[`${segment.elementId}.time`] = segment.time;
+      modifications[`${segment.elementId}.duration`] = segment.duration;
+    });
+
+    // Add separate voiceover tracks
+    modifications['VO-HOOK.source'] = voiceoverResult.hook.url;
+    modifications['VO-HOOK.time'] = timing.hookStartTime;
+    modifications['VO-HOOK.duration'] = timing.hookDuration;
+
+    modifications['VO-A.source'] = voiceoverResult.body[0].url;
+    modifications['VO-A.time'] = timing.bodyAStartTime;
+    modifications['VO-A.duration'] = timing.bodyADuration;
+
+    modifications['VO-B.source'] = voiceoverResult.body[1].url;
+    modifications['VO-B.time'] = timing.bodyBStartTime;
+    modifications['VO-B.duration'] = timing.bodyBDuration;
+
+    modifications['VO-C.source'] = voiceoverResult.body[2].url;
+    modifications['VO-C.time'] = timing.bodyCStartTime;
+    modifications['VO-C.duration'] = timing.bodyCDuration;
+
+    modifications['VO-CTA.source'] = voiceoverResult.cta.url;
+    modifications['VO-CTA.time'] = timing.ctaStartTime;
+    modifications['VO-CTA.duration'] = timing.ctaDuration;
+
+    return modifications;
+  }
+
   async createVideoWithDynamicTiming(
     videoScript: VideoScript,
     mediaSources: {
@@ -361,47 +554,52 @@ export class AppService {
 
     await this.s3Client.send(command);
 
+    // Use longer expiry time to prevent URL expiration during video processing
     const url = await getSignedUrl(
       this.s3Client,
       new GetObjectCommand({
         Bucket: 'likelionhugeteam',
         Key: path,
       }),
+      { expiresIn: 3600 * 24 }, // 24 hours instead of default 15 minutes
     );
 
     return url;
   }
 
-  async createVideoRequest(
-    videoSrc: string,
-    image1Src: string,
-    image2Src: string,
-    ctaImageSrc: string,
-    hookVO: string,
-    VO1: string,
-    VO2: string,
-    ctaVO: string,
-    hookText: string,
-    VO1Text: string,
-    VO2Text: string,
-    ctaText: string,
+  async createVideoWithTemplate3(
+    videoScript: VideoScriptTemplate3,
+    mediaSources: {
+      videoSrc: string;
+      image1Src: string;
+      image2Src: string;
+      image3Src: string;
+    },
   ) {
+    // Validate videoScript has 3 body sections
+    if (videoScript.body.length !== 3) {
+      throw new Error(
+        'VideoScript must have exactly 3 body sections for Template 3',
+      );
+    }
+
+    // Use existing voiceover creation (no changes needed)
+    const voiceoverResult = await this.createVoiceoverWithDuration(videoScript);
+
+    // Use extended timing calculation for body[2]
+    const timing = this.calculateDynamicTimingTemplate3(voiceoverResult);
+
+    // Generate Template 3 specific modifications
+    const modifications = this.generateTemplate3Modifications(
+      videoScript,
+      voiceoverResult,
+      timing,
+      mediaSources,
+    );
+
     const options = {
-      template_id: 'afd3b764-4923-4d88-87cd-c6bdd63638ae',
-      modifications: {
-        'BG-Video.source': videoSrc,
-        'Image-1.source': image1Src,
-        'Image-2.source': image2Src,
-        'CTA-Image.source': ctaImageSrc,
-        'HOOK.text': hookText,
-        'BODY-A.text': VO1Text,
-        'BODY-B.text': VO2Text,
-        'CTA.text': ctaText,
-        'VO-HOOK.source': hookVO,
-        'VO-A.source': VO1,
-        'VO-B.source': VO2,
-        'VO-CTA.source': ctaVO,
-      },
+      template_id: 'c5a2f519-2991-4398-9ad8-d16176637fcd', // Template 3 ID
+      modifications,
     };
 
     const response = await fetch(this.CMUrl, {
@@ -412,10 +610,15 @@ export class AppService {
       },
       body: JSON.stringify(options),
     });
+
+    if (!response.ok) {
+      throw new Error(
+        `Creatomate API error: ${response.status} ${response.statusText}`,
+      );
+    }
+
     const data = await response.json();
-
-    console.log(data);
-
+    console.log('Template 3 video creation response:', data);
     return data;
   }
 }
