@@ -3,8 +3,8 @@ package com.ht.htserver.user.controller;
 import com.ht.htserver.auth.service.JwtService;
 import com.ht.htserver.user.dto.request.UpdateUserOnboardingStatusRequest;
 import com.ht.htserver.user.dto.response.UserOnboardingStatusResponse;
+import com.ht.htserver.user.entity.Role;
 import com.ht.htserver.user.entity.User;
-import com.ht.htserver.user.repository.UserRepository;
 import com.ht.htserver.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -76,6 +76,7 @@ public class UserController {
         return ResponseEntity.ok(
                 UserOnboardingStatusResponse.builder()
                         .nickname(user.getNickname())
+                        .role(Role.USER)
                         .termsOfServiceAccepted(user.getTermsOfServiceAccepted())
                         .privacyPolicyAccepted(user.getPrivacyPolicyAccepted())
                         .locationServiceAccepted(user.getLocationServiceAccepted())
