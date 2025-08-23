@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -35,6 +36,11 @@ public class StoreService {
         user.addStore(store);
 
         return storeRepository.save(store);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Store> getUserStores(UUID userId) {
+        return storeRepository.findByUserId(userId);
     }
 
     @Transactional(readOnly = true)

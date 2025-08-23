@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -20,16 +21,36 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/stores")
 @RequiredArgsConstructor
 @Tag(name = "Store", description = "가게 관리 API")
+@SecurityRequirement(name = "Bearer Authentication")
 public class StoreController {
 
     private final StoreService storeService;
     private final JwtService jwtService;
+
+
+    @GetMapping
+    @Operation(summary = "사용자의 가게 목록 조회", description = "현재 인증된 사용자가 소유한 가게 목록을 조회합니다")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "가게 목록 조회 성공",
+                content = @Content(schema = @Schema(implementation = StoreResponse.class))),
+        @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자", content = @Content)
+    })
+    public ResponseEntity<List<StoreResponse>> getUserStores(
+            HttpServletRequest httpServletRequest
+    ) {
+        UUID userId = jwtService.getUserIdFromRequest(httpServletRequest);
+
+        List<Store> stores = storeService.getUserStores(userId);
+
+        return ResponseEntity.ok(stores.stream().map((StoreResponse::toDto)).toList());
+    }
 
     @PostMapping
     @Operation(summary = "가게 생성", description = "새로운 가게를 생성합니다")
