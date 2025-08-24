@@ -24,6 +24,9 @@ public class VideoGenerationStatusResponse {
     @Schema(description = "생성된 영상 URL (완료 시에만 제공)", example = "https://f002.backblazeb2.com/file/creatomate-c8xg3hsxdu/video-id.mp4")
     private String generatedVideoUrl;
 
+    @Schema(description = "생성된 영상 정보 (완료 시에만 제공)")
+    private VideoResponse video;
+
     @Schema(description = "오류 메시지 (실패 시에만 제공)", example = "Video generation failed due to invalid input")
     private String errorMessage;
 }

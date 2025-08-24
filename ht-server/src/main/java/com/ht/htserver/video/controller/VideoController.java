@@ -6,6 +6,7 @@ import com.ht.htserver.video.dto.response.VideoGenerationStatusResponse;
 import com.ht.htserver.video.dto.response.VideoResponse;
 import com.ht.htserver.video.entity.Video;
 import com.ht.htserver.video.entity.VideoGeneration;
+import com.ht.htserver.video.entity.VideoGenerationStatus;
 import com.ht.htserver.video.exception.VideoNotFoundException;
 import com.ht.htserver.video.repository.VideoRepository;
 import com.ht.htserver.video.service.VideoService;
@@ -76,9 +77,10 @@ public class VideoController {
     }
 
     @GetMapping("/generations/{video_generation_id}")
-    @Operation(summary = "영상 생성 상태 조회", description = "영상 생성 ID로 생성 상태를 조회합니다")
+    @Operation(summary = "영상 생성 상태 조회", 
+               description = "영상 생성 ID로 생성 상태를 조회합니다. 생성이 완료된 경우 영상 정보도 함께 반환됩니다.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "영상 생성 상태 조회 성공",
+        @ApiResponse(responseCode = "200", description = "영상 생성 상태 조회 성공. 생성 완료 시 video 객체 포함",
                 content = @Content(schema = @Schema(implementation = VideoGenerationStatusResponse.class))),
         @ApiResponse(responseCode = "404", description = "영상 생성 요청을 찾을 수 없음", content = @Content)
     })
@@ -87,12 +89,18 @@ public class VideoController {
     ) {
         VideoGeneration videoGeneration = videoService.getVideoGenerationStatus(videoGenerationId);
         
-        return ResponseEntity.ok(VideoGenerationStatusResponse.builder()
+        VideoGenerationStatusResponse.VideoGenerationStatusResponseBuilder responseBuilder = VideoGenerationStatusResponse.builder()
                 .videoGenerationId(videoGeneration.getId())
                 .status(videoGeneration.getStatus())
                 .createdAt(videoGeneration.getCreatedAt())
                 .generatedVideoUrl(videoGeneration.getGeneratedVideoUrl())
-                .errorMessage(videoGeneration.getErrorMessage())
-                .build());
+                .errorMessage(videoGeneration.getErrorMessage());
+
+        // Include video object if generation is finished and video exists
+        if (videoGeneration.getStatus() == VideoGenerationStatus.FINISHED && videoGeneration.getVideo() != null) {
+            responseBuilder.video(VideoResponse.toDto(videoGeneration.getVideo()));
+        }
+
+        return ResponseEntity.ok(responseBuilder.build());
     }
 }

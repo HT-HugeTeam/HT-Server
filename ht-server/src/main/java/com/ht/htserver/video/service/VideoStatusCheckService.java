@@ -1,6 +1,7 @@
 package com.ht.htserver.video.service;
 
 import com.ht.htserver.video.dto.creatomate.CreatomateRenderResponse;
+import com.ht.htserver.video.entity.Video;
 import com.ht.htserver.video.entity.VideoGeneration;
 import com.ht.htserver.video.entity.VideoGenerationStatus;
 import com.ht.htserver.video.repository.VideoGenerationRepository;
@@ -20,6 +21,7 @@ public class VideoStatusCheckService {
     
     private final VideoGenerationRepository videoGenerationRepository;
     private final CreatomateApiService creatomateApiService;
+    private final VideoService videoService;
 
     // Removed scheduled polling - now only checks on-demand via GET requests
     
@@ -52,10 +54,16 @@ public class VideoStatusCheckService {
             }
             case "succeeded" -> {
                 if (response.getUrl() != null && !response.getUrl().trim().isEmpty()) {
+                    // Create Video entity instead of just storing URL
+                    Video video = videoService.createVideoFromGeneration(generation, response.getUrl());
+                    
+                    // Update generation status and link to the created video
                     generation.updateStatusWithVideoUrl(VideoGenerationStatus.FINISHED, response.getUrl());
+                    generation.setVideo(video);
                     videoGenerationRepository.save(generation);
-                    log.info("Video generation ID {} completed successfully with URL: {}", 
-                            generation.getId(), response.getUrl());
+                    
+                    log.info("Video generation ID {} completed successfully. Created Video ID {} with URL: {}", 
+                            generation.getId(), video.getId(), response.getUrl());
                 } else {
                     log.warn("Video generation ID {} succeeded but no URL provided", generation.getId());
                 }

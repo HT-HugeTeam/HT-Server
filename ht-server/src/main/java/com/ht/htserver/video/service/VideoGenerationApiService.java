@@ -30,9 +30,6 @@ public class VideoGenerationApiService {
         return createVideoInternal(request, "/");
     }
 
-    public NestJSVideoResponse createVideoTemplate3(NestJSVideoRequest request) {
-        return createVideoInternal(request, "/template3");
-    }
 
     private NestJSVideoResponse createVideoInternal(NestJSVideoRequest request, String endpoint) {
         try {

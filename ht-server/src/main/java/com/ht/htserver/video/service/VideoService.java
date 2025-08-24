@@ -127,6 +127,23 @@ public class VideoService {
         return videoGeneration;
     }
 
+    @Transactional
+    public Video createVideoFromGeneration(VideoGeneration videoGeneration, String videoUrl) {
+        log.info("Creating Video entity for VideoGeneration ID: {} with URL: {}", 
+                videoGeneration.getId(), videoUrl);
+        
+        Video video = new Video();
+        video.setVideoUrl(videoUrl);
+        video.setStore(videoGeneration.getStore());
+        video.setViews(0L);
+        
+        Video savedVideo = videoRepository.save(video);
+        log.info("Created Video entity with ID: {} for VideoGeneration ID: {}", 
+                savedVideo.getId(), videoGeneration.getId());
+        
+        return savedVideo;
+    }
+
     private NestJSVideoRequest mapToNestJSRequest(CreateVideoGenerationRequest request) {
         // Extract URLs from the request
         List<String> imageUrls = request.getImages().stream()
