@@ -57,7 +57,7 @@ public class AuthController {
             String accessToken = authService.loginWithAuthorizationCode(request.getAuthorizationCode());
             return ResponseEntity.ok(new LoginResponse(accessToken));
         } catch (Exception e) {
-            log.error("Kakao login failed", e);
+            // log.error("Kakao login failed", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

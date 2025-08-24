@@ -19,7 +19,7 @@ public class ImageRequest extends BaseEntity {
     @Column
     private String name;
 
-    @Column
+    @Column(length = 2048)
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -91,6 +91,8 @@ public class VideoController {
                 .videoGenerationId(videoGeneration.getId())
                 .status(videoGeneration.getStatus())
                 .createdAt(videoGeneration.getCreatedAt())
+                .generatedVideoUrl(videoGeneration.getGeneratedVideoUrl())
+                .errorMessage(videoGeneration.getErrorMessage())
                 .build());
     }
 }

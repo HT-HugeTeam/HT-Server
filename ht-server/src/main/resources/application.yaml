@@ -33,3 +33,12 @@ springdoc:
 server:
   forward-headers-strategy: native
   port: 30001
+
+video-generation:
+  nestjs:
+    base-url: ${NESTJS_VIDEO_SERVICE_URL:http://localhost:30000}
+    timeout: ${NESTJS_TIMEOUT:300000}
+
+creatomate:
+  api-key: ${CREATOMATE_API_KEY:}
+  base-url: ${CREATOMATE_BASE_URL:https://api.creatomate.com/v1}

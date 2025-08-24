@@ -23,7 +23,7 @@ public class User extends BaseEntity {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "profile_image_url")
+    @Column(name = "profile_image_url", length = 2048)
     private String profileImageUrl;
 
     @Column(name = "nickname")

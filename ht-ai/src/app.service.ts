@@ -72,8 +72,6 @@ export class AppService {
       max_output_tokens: 400,
     });
 
-    console.log(JSON.parse(response.output_text));
-
     return JSON.parse(response.output_text) as ImageAnalysis;
   }
 
@@ -107,8 +105,6 @@ export class AppService {
       ],
       max_output_tokens: 1000,
     });
-
-    console.log(JSON.parse(response.output_text));
 
     return JSON.parse(response.output_text) as VideoScript;
   }
@@ -150,8 +146,6 @@ The output must follow this exact structure with 3 body sections.`,
       ],
       max_output_tokens: 1200,
     });
-
-    console.log('Template 3 VideoScript:', JSON.parse(response.output_text));
 
     return JSON.parse(response.output_text) as VideoScriptTemplate3;
   }
@@ -215,8 +209,6 @@ The output must follow this exact structure with 3 body sections.`,
       body: bodyAudioWithDuration,
       cta: { url: ctaVoiceoverUrl, duration: ctaDuration },
     };
-
-    console.log(result);
 
     return result;
   }
@@ -538,8 +530,6 @@ The output must follow this exact structure with 3 body sections.`,
 
     const data = await response.json();
 
-    console.log(data);
-
     return data;
   }
 
@@ -598,7 +588,7 @@ The output must follow this exact structure with 3 body sections.`,
     );
 
     const options = {
-      template_id: 'c5a2f519-2991-4398-9ad8-d16176637fcd', // Template 3 ID
+      template_id: 'afd3b764-4923-4d88-87cd-c6bdd63638ae', // Template 3 ID
       modifications,
     };
 
@@ -618,7 +608,6 @@ The output must follow this exact structure with 3 body sections.`,
     }
 
     const data = await response.json();
-    console.log('Template 3 video creation response:', data);
     return data;
   }
 }

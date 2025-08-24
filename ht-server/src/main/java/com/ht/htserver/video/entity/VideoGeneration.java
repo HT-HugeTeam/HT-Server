@@ -42,6 +42,15 @@ public class  VideoGeneration extends BaseEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
+    @Column(name = "external_job_id")
+    private String externalJobId;
+
+    @Column(name = "generated_video_url", length = 2048)
+    private String generatedVideoUrl;
+
+    @Column(name = "error_message", length = 1024)
+    private String errorMessage;
+
     public void addImage(ImageRequest image) {
         images.add(image);
         image.setVideoGeneration(this);
@@ -51,4 +60,23 @@ public class  VideoGeneration extends BaseEntity {
         videos.add(video);
         video.setVideoGeneration(this);
     };
+
+    public void updateStatus(VideoGenerationStatus status) {
+        this.status = status;
+    }
+
+    public void updateStatusWithJobId(VideoGenerationStatus status, String externalJobId) {
+        this.status = status;
+        this.externalJobId = externalJobId;
+    }
+
+    public void updateStatusWithError(VideoGenerationStatus status, String errorMessage) {
+        this.status = status;
+        this.errorMessage = errorMessage;
+    }
+
+    public void updateStatusWithVideoUrl(VideoGenerationStatus status, String generatedVideoUrl) {
+        this.status = status;
+        this.generatedVideoUrl = generatedVideoUrl;
+    }
 }

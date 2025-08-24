@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 public class VideoRequest extends BaseEntity {
 
-    @Column
+    @Column(length = 2048)
     private String videoUrl;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

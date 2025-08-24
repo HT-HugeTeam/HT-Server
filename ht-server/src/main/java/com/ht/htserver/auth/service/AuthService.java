@@ -52,7 +52,7 @@ public class AuthService {
             return jwtService.generateToken(user.getId());
             
         } catch (Exception e) {
-            log.error("Failed to login with Kakao authorization code", e);
+            // log.error("Failed to login with Kakao authorization code", e);
             throw new RuntimeException("Failed to login with Kakao", e);
         }
     }
