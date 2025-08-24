@@ -6,11 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Builder
 @Schema(description = "영상 정보 응답")
 public class VideoResponse {
+    @Schema(description = "영상 ID", example = "ef646d62-3eaf-4550-ac9c-01383bf0dd8c")
+    private UUID id;
+
     @Schema(description = "영상 URL", example = "https://example.com/video.mp4")
     private String videoUrl;
     
@@ -28,6 +32,7 @@ public class VideoResponse {
 
     public static VideoResponse toDto(Video video) {
         return VideoResponse.builder()
+                .id(video.getId())
                 .videoUrl(video.getVideoUrl())
                 .address(video.getStore().getAddress())
                 .storeName(video.getStore().getName())
