@@ -1,6 +1,6 @@
 package com.ht.htserver.home.dto.response;
 
-import com.ht.htserver.video.entity.Video;
+import com.ht.htserver.video.dto.response.VideoResponse;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 public class HomeResponse {
     @Builder.Default
-    private List<Video> videos = new ArrayList<>();
+    private List<VideoResponse> videos = new ArrayList<>();
 
     private Long mostRecentViews;
 }
