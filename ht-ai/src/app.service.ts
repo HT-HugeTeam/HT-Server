@@ -78,6 +78,7 @@ export class AppService {
   async createVideoScript(
     imageAnalysis: ImageAnalysis,
     text: string,
+    store: string,
   ): Promise<VideoScript> {
     const response = await this.openAiClient.responses.create({
       model: 'gpt-5-nano-2025-08-07',
@@ -99,6 +100,10 @@ export class AppService {
             {
               type: 'input_text' as const,
               text,
+            },
+            {
+              type: 'input_text' as const,
+              text: `Store info: ${store}\n Use the store info appropriately to make the video of the store look more appealing.`,
             },
           ] as const,
         },

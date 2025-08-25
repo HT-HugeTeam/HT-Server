@@ -91,7 +91,6 @@ public class VideoService {
 
             log.info("Using standard endpoint for video generation with {} images", request.getImages().size());
             response = videoGenerationApiService.createVideo(nestjsRequest);
-
             
             // Update with job ID if available
             if (response != null && response.getId() != null) {
@@ -147,6 +146,7 @@ public class VideoService {
     }
 
     private NestJSVideoRequest mapToNestJSRequest(CreateVideoGenerationRequest request) {
+        Store store = storeService.getStore(request.getStoreId());
         // Extract URLs from the request
         List<String> imageUrls = request.getImages().stream()
                 .map(ImageRequestDto::getImageUrl)
@@ -165,6 +165,7 @@ public class VideoService {
                 .image3Url(image3Url)
                 .videoUrl(videoUrl)
                 .text(request.getText())
+                .store(store.toString())
                 .build();
     }
 

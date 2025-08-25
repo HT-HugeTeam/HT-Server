@@ -40,4 +40,5 @@ public class Store extends BaseEntity {
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VideoGeneration> videoGenerations = new ArrayList<>();
+
 }

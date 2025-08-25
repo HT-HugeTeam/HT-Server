@@ -8,7 +8,8 @@ export class AppController {
 
   @Post()
   async createVideo(@Body() createVideoDto: CreateVideoDto) {
-    const { image1Url, image2Url, image3Url, videoUrl, text } = createVideoDto;
+    const { image1Url, image2Url, image3Url, videoUrl, text, store } =
+      createVideoDto;
 
     const imageAnalysis = await this.appService.analyzeImage(
       [image1Url, image2Url],
@@ -18,6 +19,7 @@ export class AppController {
     const videoScript = await this.appService.createVideoScript(
       imageAnalysis,
       text,
+      store,
     );
 
     const videoResponse = await this.appService.createVideoWithDynamicTiming(

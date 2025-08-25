@@ -11,4 +11,5 @@ public class NestJSVideoRequest {
     private String image3Url;
     private String videoUrl;
     private String text;
+    private String store;
 }

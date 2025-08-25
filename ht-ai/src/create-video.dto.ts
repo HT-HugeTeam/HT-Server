@@ -4,4 +4,5 @@ export interface CreateVideoDto {
   image3Url: string;
   videoUrl: string;
   text: string;
+  store: string;
 }
