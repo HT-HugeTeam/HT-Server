@@ -53,11 +53,36 @@ public class AuthController {
         @ApiResponse(responseCode = "500", description = "카카오 API 통신 실패", content = @Content)
     })
     public ResponseEntity<LoginResponse> kakaoLogin(@Valid @RequestBody KakaoLoginRequest request) {
+        log.info("🔐 Starting Kakao OAuth login process");
+        log.debug("📋 Kakao login request received with authorization code length: {}", 
+                  request.getAuthorizationCode() != null ? request.getAuthorizationCode().length() : 0);
+        
+        long startTime = System.currentTimeMillis();
+        
         try {
+            log.info("🎯 Processing Kakao authorization code authentication");
             String accessToken = authService.loginWithAuthorizationCode(request.getAuthorizationCode());
+            
+            long duration = System.currentTimeMillis() - startTime;
+            log.info("✅ Kakao login successful in {}ms, JWT token generated", duration);
+            log.debug("📤 Returning JWT token with length: {}", accessToken != null ? accessToken.length() : 0);
+            
             return ResponseEntity.ok(new LoginResponse(accessToken));
+            
+        } catch (RuntimeException e) {
+            long duration = System.currentTimeMillis() - startTime;
+            log.error("❌ Kakao login failed after {}ms - Runtime Exception: {}", duration, e.getMessage(), e);
+            
+            if (e.getMessage().contains("Failed to login with Kakao")) {
+                log.error("🔴 Kakao API communication error detected");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+            
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            
         } catch (Exception e) {
-            // log.error("Kakao login failed", e);
+            long duration = System.currentTimeMillis() - startTime;
+            log.error("💥 Unexpected error during Kakao login after {}ms: {}", duration, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/home")
 @Tag(name = "Home", description = "홈 화면 API")
+@Slf4j
 public class HomeController {
 
     private final HomeService homeService;
@@ -37,8 +39,28 @@ public class HomeController {
     public HomeResponse getHomeData(
             HttpServletRequest httpServletRequest
     ) {
-        UUID userId = jwtService.getUserIdFromRequest(httpServletRequest);
-
-        return homeService.getHomeData(userId);
+        log.info("🏠 Fetching home data for authenticated user");
+        long startTime = System.currentTimeMillis();
+        
+        try {
+            log.debug("🔍 Extracting user ID from JWT token");
+            UUID userId = jwtService.getUserIdFromRequest(httpServletRequest);
+            log.debug("👤 User ID extracted: {}", userId);
+            
+            log.info("📊 Retrieving home data for user: {}", userId);
+            HomeResponse homeData = homeService.getHomeData(userId);
+            
+            long duration = System.currentTimeMillis() - startTime;
+            log.info("✅ Home data retrieved successfully in {}ms", duration);
+            log.debug("📤 Home response prepared with data: {}", 
+                     homeData != null ? "Present" : "Null");
+            
+            return homeData;
+            
+        } catch (Exception e) {
+            long duration = System.currentTimeMillis() - startTime;
+            log.error("❌ Failed to fetch home data after {}ms: {}", duration, e.getMessage(), e);
+            throw e;
+        }
     }
 }
