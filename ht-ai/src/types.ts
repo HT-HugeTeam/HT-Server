@@ -71,3 +71,7 @@ export interface TextSegment {
 export interface CreatomateModifications {
   [key: string]: string | number;
 }
+
+export interface VideoAnalysisResult {
+  summary: string;
+}

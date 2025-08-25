@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import OpenAI from 'openai';
+import { TwelveLabs } from 'twelvelabs-js';
 import {
   SYSTEM_IMAGE_ANALYSIS,
   SYSTEM_VIDEO_SCRIPT,
@@ -14,6 +15,7 @@ import {
   DynamicTimingTemplate3,
   TextSegment,
   CreatomateModifications,
+  VideoAnalysisResult,
 } from './types';
 import { parseBuffer } from 'music-metadata';
 import {
@@ -37,6 +39,10 @@ export class AppService {
 
   private readonly openAiClient = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY!,
+  });
+
+  private readonly twelveLabs = new TwelveLabs({
+    apiKey: process.env.TL_API_KEY,
   });
 
   private readonly CMUrl = 'https://api.creatomate.com/v1/renders';
@@ -75,10 +81,86 @@ export class AppService {
     return JSON.parse(response.output_text) as ImageAnalysis;
   }
 
+  async analyzeVideo(videoUrl: string): Promise<VideoAnalysisResult> {
+    try {
+      let indexId = process.env.TL_INDEX_ID;
+
+      if (!indexId) {
+        const index = await this.twelveLabs.indexes.create({
+          indexName: `video-analysis-${Date.now()}`,
+          models: [
+            {
+              modelName: 'pegasus1.2',
+              modelOptions: ['visual', 'audio'],
+            },
+          ],
+        });
+        indexId = index.id;
+      }
+
+      if (!indexId) {
+        throw new Error('Failed to create or retrieve index ID');
+      }
+
+      const task = await this.twelveLabs.tasks.create({
+        indexId: indexId,
+        videoUrl: videoUrl,
+      });
+
+      if (!task.id) {
+        throw new Error('Failed to create video indexing task');
+      }
+
+      const completedTask = await this.twelveLabs.tasks.waitForDone(task.id, {
+        sleepInterval: 5.0,
+        callback: (task) => {
+          console.log(`Video processing status: ${task.status}`);
+        },
+      });
+
+      if (completedTask.status !== 'ready') {
+        throw new Error(
+          `Video processing failed with status: ${completedTask.status}`,
+        );
+      }
+
+      if (!completedTask.videoId) {
+        throw new Error('No video ID returned from completed task');
+      }
+
+      const summaryResponse = await this.twelveLabs.summarize({
+        videoId: completedTask.videoId,
+        type: 'summary',
+        prompt:
+          'Generate a very detailed and descriptive summary of this video, focusing on visual content, actions, dialogue, scenes, and overall narrative. Make it comprehensive and engaging for someone who has not seen the video.',
+        temperature: 0.3,
+      });
+
+      let summary: string;
+      if (summaryResponse.summarizeType === 'summary') {
+        summary = summaryResponse.summary || 'No summary available';
+      } else {
+        throw new Error('Unexpected response type from summarize API');
+      }
+
+      console.log(summary);
+
+      return {
+        summary: summary,
+      };
+    } catch (error) {
+      console.error('Error analyzing video:', error);
+      throw new Error(
+        `Failed to analyze video: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+  }
+
   async createVideoScript(
     imageAnalysis: ImageAnalysis,
     text: string,
     store: string,
+    videoSummary: string,
   ): Promise<VideoScript> {
     const response = await this.openAiClient.responses.create({
       model: 'gpt-5-nano-2025-08-07',
@@ -105,6 +187,10 @@ export class AppService {
               type: 'input_text' as const,
               text: `Store info: ${store}\n Use the store info appropriately to make the video of the store look more appealing.`,
             },
+            {
+              type: 'input_text' as const,
+              text: `Video summary: ${videoSummary}. Use this to make the video script much more descriptive, attracting, and appealing. `,
+            },
           ] as const,
         },
       ],
@@ -114,47 +200,6 @@ export class AppService {
     return JSON.parse(response.output_text) as VideoScript;
   }
 
-  async createVideoScriptTemplate3(
-    imageAnalysis: ImageAnalysis,
-    text: string,
-  ): Promise<VideoScriptTemplate3> {
-    const response = await this.openAiClient.responses.create({
-      model: 'gpt-5-nano-2025-08-07',
-      reasoning: { effort: 'minimal' },
-      input: [
-        {
-          role: 'system',
-          content: `${SYSTEM_VIDEO_SCRIPT}
-
-IMPORTANT: Generate exactly 3 body sections for Template 3:
-- body[0]: First menu item description
-- body[1]: Second menu item description
-- body[2]: Restaurant atmosphere/ambiance description
-
-The output must follow this exact structure with 3 body sections.`,
-        },
-        {
-          role: 'user',
-          content: [
-            ...imageAnalysis.imageDescriptions.map((description) => {
-              return {
-                type: 'input_text' as const,
-                text: `description:${description.description},caption:${description.caption}`,
-              };
-            }),
-            {
-              type: 'input_text' as const,
-              text,
-            },
-          ] as const,
-        },
-      ],
-      max_output_tokens: 1200,
-    });
-
-    return JSON.parse(response.output_text) as VideoScriptTemplate3;
-  }
-
   async createVoiceoverWithDuration(
     videoScript: VideoScript | VideoScriptTemplate3,
   ): Promise<VoiceoverResult> {
@@ -162,7 +207,8 @@ The output must follow this exact structure with 3 body sections.`,
       model: 'gpt-4o-mini-tts',
       input: videoScript.hook.voiceover,
       voice: 'coral',
-      instructions: 'Speak in a cheerful and positive tone.',
+      instructions:
+        'Speak in a cheerful and positive tone.  It will be used in an instagram reel to attract new customers to the restaurant. Make it HOOKING',
     });
     const hookBuffer = Buffer.from(await hookVoiceover.arrayBuffer());
     const hookDuration = await this.extractAudioDuration(hookBuffer);
@@ -177,7 +223,8 @@ The output must follow this exact structure with 3 body sections.`,
           model: 'gpt-4o-mini-tts',
           input: b.voiceover,
           voice: 'coral',
-          instructions: 'Speak in a cheerful and positive tone.',
+          instructions:
+            'Speak in a cheerful and positive tone.  It will be used in an instagram reel to attract new customers to the restaurant. Make it HOOKING',
         }),
       ),
     );
@@ -200,7 +247,8 @@ The output must follow this exact structure with 3 body sections.`,
       model: 'gpt-4o-mini-tts',
       input: videoScript.cta.voiceover,
       voice: 'coral',
-      instructions: 'Speak in a cheerful and positive tone.',
+      instructions:
+        'Speak in a cheerful and positive tone.  It will be used in an instagram reel to attract new customers to the restaurant. Make it HOOKING',
     });
     const ctaBuffer = Buffer.from(await ctaVoiceover.arrayBuffer());
     const ctaDuration = await this.extractAudioDuration(ctaBuffer);
