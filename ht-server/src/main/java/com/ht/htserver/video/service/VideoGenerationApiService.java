@@ -37,10 +37,14 @@ public class VideoGenerationApiService {
         log.debug("⏱️ Timeout configured: {}ms", timeoutMillis);
         
         if (request != null) {
-            log.debug("📋 Request details - Template: {}, Images: {}, Store: {}", 
-                     request.getTemplate() != null ? request.getTemplate() : "null",
-                     request.getImages() != null ? request.getImages().size() : 0,
+            log.debug("📋 Request details - Image1: {}, Image2: {}, Image3: {}, Store: {}", 
+                     request.getImage1Url() != null ? "Present" : "null",
+                     request.getImage2Url() != null ? "Present" : "null", 
+                     request.getImage3Url() != null ? "Present" : "null",
                      request.getStore() != null ? "Present" : "null");
+            log.debug("📝 Text length: {}, Video URL: {}", 
+                     request.getText() != null ? request.getText().length() : 0,
+                     request.getVideoUrl() != null ? "Present" : "null");
         }
         
         long startTime = System.currentTimeMillis();
@@ -81,8 +85,11 @@ public class VideoGenerationApiService {
                             if (!response.isEmpty()) {
                                 NestJSVideoResponse firstResponse = response.get(0);
                                 log.debug("🎬 Video response - Video URL available: {}", 
-                                         firstResponse.getVideoUrl() != null);
+                                         firstResponse.getUrl() != null);
                                 log.debug("🔢 Response ID: {}", firstResponse.getId());
+                                log.debug("📊 Status: {}, Template: {}", 
+                                         firstResponse.getStatus(),
+                                         firstResponse.getTemplateName());
                             }
                         }
                     })
@@ -119,8 +126,10 @@ public class VideoGenerationApiService {
             log.debug("📤 Returning first response from list of {} items", responseList.size());
             
             NestJSVideoResponse result = responseList.get(0);
-            log.debug("✅ Final result - Video URL: {}, ID: {}", 
-                     result.getVideoUrl() != null ? "Present" : "null", result.getId());
+            log.debug("✅ Final result - Video URL: {}, ID: {}, Status: {}", 
+                     result.getUrl() != null ? "Present" : "null", 
+                     result.getId(),
+                     result.getStatus());
             
             return result;
 
